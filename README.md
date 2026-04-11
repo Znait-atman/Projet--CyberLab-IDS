@@ -59,4 +59,11 @@ cd /opt/cyberlab-agent
 sudo venv/bin/python3 agent.py
 ```
 
+## Authors
+
+- **Zahra Nait Atman**
+- **Camélia Charef**
+
+Supervisors: Lyes Khoukhi — Abdel Senoussaoui
+
 **Browser → http://192.168.100.1:5000**
