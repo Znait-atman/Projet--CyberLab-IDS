@@ -48,6 +48,11 @@ source venv/bin/activate
 python3 app.py
 ```
 
+**VM-Server**
+```bash
+ping 192.168.100.1
+```
+
 **VM-Attacker**
 ```bash
 cd /opt/cyberlab-agent
