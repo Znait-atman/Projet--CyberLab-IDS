@@ -8,307 +8,122 @@
 <script src="/static/js/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg:        #0a0f1e;
-  --surface:   #0f1729;
-  --surface2:  #131f35;
-  --border:    #1e3050;
-  --border2:   #253d5e;
-  --blue:      #1e6fff;
-  --blue-dim:  #0d3a8a;
-  --cyan:      #00cfff;
-  --green:     #00d68f;
-  --red:       #ff3355;
-  --yellow:    #ffbb00;
-  --orange:    #ff7733;
-  --text:      #cdd6e8;
-  --text-dim:  #4e6a8a;
-  --text-mid:  #8aa0bc;
+  --bg:#0a0f1e; --surface:#0f1729; --surface2:#131f35;
+  --border:#1e3050; --border2:#253d5e; --blue:#1e6fff;
+  --blue-dim:#0d3a8a; --cyan:#00cfff; --green:#00d68f;
+  --red:#ff3355; --yellow:#ffbb00; --orange:#ff7733;
+  --text:#cdd6e8; --text-dim:#4e6a8a; --text-mid:#8aa0bc;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; min-height: 100vh; }
-
-/* ── HEADER ── */
-.header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 56px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.header-left { display: flex; align-items: center; gap: 16px; }
-.logo-mark {
-  width: 36px; height: 36px;
-  background: var(--blue);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; font-weight: 900; color: #fff; letter-spacing: -1px;
-}
-.logo-text h1 { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: 1px; }
-.logo-text p  { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
-.header-right { display: flex; align-items: center; gap: 12px; }
-#clock { font-size: 13px; color: var(--cyan); font-family: monospace; }
-#agent-pill {
-  padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 600;
-  letter-spacing: 1px; text-transform: uppercase;
-  background: #1a2a3a; border: 1px solid var(--border); color: var(--text-dim);
-}
-#agent-pill.online { background: rgba(0,214,143,0.12); border-color: var(--green); color: var(--green); }
-.btn-emergency {
-  padding: 7px 16px; border-radius: 6px; border: 1px solid var(--red);
-  background: rgba(255,51,85,0.1); color: var(--red);
-  font-size: 11px; font-weight: 700; letter-spacing: 1px; cursor: pointer;
-  transition: all 0.2s; text-transform: uppercase;
-}
-.btn-emergency:hover { background: rgba(255,51,85,0.25); box-shadow: 0 0 12px rgba(255,51,85,0.3); }
-
-/* ── STATS BAR ── */
-.stats-bar {
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  padding: 10px 20px;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 1px;
-}
-.stat-item {
-  padding: 6px 16px;
-  border-right: 1px solid var(--border);
-  text-align: center;
-}
-.stat-item:last-child { border-right: none; }
-.stat-item .val { font-size: 20px; font-weight: 700; font-family: monospace; line-height: 1; }
-.stat-item .lbl { font-size: 9px; color: var(--text-dim); margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
-.c-blue   { color: var(--blue); }
-.c-cyan   { color: var(--cyan); }
-.c-green  { color: var(--green); }
-.c-red    { color: var(--red); }
-.c-yellow { color: var(--yellow); }
-.c-orange { color: var(--orange); }
-.c-white  { color: #fff; }
-
-/* ── IDS ALERT BAR ── */
-#ids-bar {
-  background: rgba(255,51,85,0.08);
-  border-bottom: 1px solid rgba(255,51,85,0.3);
-  padding: 8px 20px;
-  display: none;
-  align-items: center;
-  gap: 12px;
-}
-#ids-bar.visible { display: flex; }
-.ids-icon { font-size: 16px; animation: pulse-icon 0.8s infinite; }
-@keyframes pulse-icon { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
-#ids-text { font-size: 12px; color: var(--red); font-weight: 600; flex: 1; }
-.ids-badge {
-  padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700;
-  background: var(--red); color: #fff; letter-spacing: 1px;
-  animation: blink-bg 1s infinite;
-}
-@keyframes blink-bg { 0%,100%{opacity:1} 50%{opacity:0.5} }
-
-/* ── LAYOUT ── */
-.main { padding: 16px; display: grid; gap: 14px; max-width: 1600px; margin: 0 auto; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media(max-width:1100px) { .grid-3,.grid-2 { grid-template-columns:1fr; } }
-
-/* ── PANELS ── */
-.panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.panel-head {
-  padding: 11px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  background: rgba(255,255,255,0.015);
-}
-.panel-title {
-  font-size: 11px; font-weight: 700; letter-spacing: 2px;
-  text-transform: uppercase; display: flex; align-items: center; gap: 8px;
-}
-.panel-title .dot-ind {
-  width: 6px; height: 6px; border-radius: 50%; background: var(--blue);
-}
-.panel-body { padding: 14px; }
-
-/* ── TOPOLOGY SVG ── */
-#topology { width: 100%; height: 275px; }
-
-/* ── STATUS PILLS ── */
-.pill {
-  padding: 3px 10px; border-radius: 20px;
-  font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-}
-.pill-idle    { background: #1a2535; border: 1px solid var(--border); color: var(--text-dim); }
-.pill-active  { background: rgba(255,51,85,0.15); border: 1px solid var(--red); color: var(--red); animation: blink-border 1s infinite; }
-.pill-ok      { background: rgba(0,214,143,0.12); border: 1px solid var(--green); color: var(--green); }
-.pill-warn    { background: rgba(255,187,0,0.12); border: 1px solid var(--yellow); color: var(--yellow); }
-@keyframes blink-border { 0%,100%{opacity:1} 50%{opacity:0.6} }
-
-/* ── FORM ── */
-.form-grid { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center; margin-bottom: 12px; }
-.form-grid label { font-size: 11px; color: var(--text-dim); white-space: nowrap; }
-.form-grid input, .form-grid select {
-  background: #08111e; border: 1px solid var(--border);
-  border-radius: 5px; color: var(--text); padding: 5px 9px;
-  font-size: 12px; font-family: monospace; width: 100%;
-}
-.form-grid input:focus, .form-grid select:focus { outline: none; border-color: var(--blue); }
-
-/* ── BUTTONS ── */
-.btn-row { display: flex; gap: 8px; margin-bottom: 14px; }
-.btn {
-  padding: 7px 16px; border: none; border-radius: 6px;
-  font-size: 11px; font-weight: 700; letter-spacing: 1px;
-  cursor: pointer; transition: all 0.18s; text-transform: uppercase;
-}
-.btn-danger { background: var(--red); color: #fff; }
-.btn-danger:hover { background: #cc2244; box-shadow: 0 3px 12px rgba(255,51,85,0.4); }
-.btn-danger:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
-.btn-ghost  {
-  background: transparent; border: 1px solid var(--border);
-  color: var(--text-mid);
-}
-.btn-ghost:hover:not(:disabled) { background: var(--surface2); border-color: var(--border2); }
-.btn-ghost:disabled { opacity: 0.35; cursor: not-allowed; }
-.btn-blue { background: var(--blue); color: #fff; }
-.btn-blue:hover { background: #1559d9; }
-
-/* ── METRICS ── */
-.metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
-.metric {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 7px; padding: 10px; text-align: center;
-}
-.metric .mv { font-size: 22px; font-weight: 700; font-family: monospace; line-height: 1; }
-.metric .ml { font-size: 9px; color: var(--text-dim); margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
-
-/* ── PACKET TABLE ── */
-.pkt-wrap { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
-.pkt-head-row {
-  display: grid;
-  grid-template-columns: 58px 105px 105px 55px 1fr 50px;
-  padding: 5px 10px;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  font-size: 9px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase;
-}
-.pkt-scroll { max-height: 200px; overflow-y: auto; }
-.pkt-scroll::-webkit-scrollbar { width: 3px; }
-.pkt-scroll::-webkit-scrollbar-thumb { background: var(--border); }
-.pkt-row {
-  display: grid;
-  grid-template-columns: 58px 105px 105px 55px 1fr 50px;
-  padding: 4px 10px;
-  border-bottom: 1px solid rgba(30,48,80,0.4);
-  font-size: 10px; font-family: monospace;
-  animation: fadeIn 0.25s ease;
-}
-@keyframes fadeIn { from{opacity:0;transform:translateY(-3px)} to{opacity:1;transform:none} }
-.pkt-row:hover { background: rgba(255,255,255,0.02); }
-.pkt-empty { padding: 20px; text-align: center; color: var(--text-dim); font-size: 11px; }
-.ph { color: var(--green); }
-.pd { color: var(--cyan); }
-.pt { color: var(--yellow); }
-.pa { color: var(--orange); }
-.po { color: var(--text-dim); }
-
-/* ── CHART ── */
-.chart-wrap { position: relative; height: 160px; margin-top: 8px; }
-.chart-lbl { font-size: 9px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
-
-/* ── HISTORY TABLE ── */
-.hist-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-.hist-table th { padding: 7px 10px; text-align: left; font-size: 9px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--surface2); }
-.hist-table td { padding: 7px 10px; border-bottom: 1px solid rgba(30,48,80,0.4); font-family: monospace; font-size: 11px; }
-.hist-wrap { max-height: 220px; overflow-y: auto; }
-.hist-wrap::-webkit-scrollbar { width: 3px; }
-.hist-wrap::-webkit-scrollbar-thumb { background: var(--border); }
-.hist-empty { padding: 24px; text-align: center; color: var(--text-dim); }
-.tag {
-  display: inline-block; padding: 2px 8px; border-radius: 4px;
-  font-size: 9px; font-weight: 700; letter-spacing: 1px;
-}
-.tag-mitm  { background: rgba(255,187,0,0.15);  color: var(--yellow); }
-.tag-ddos  { background: rgba(255,51,85,0.15);   color: var(--red); }
-.tag-ended { background: rgba(0,214,143,0.12);   color: var(--green); }
-
-/* ── LOG ── */
-.log-wrap { max-height: 180px; overflow-y: auto; }
-.log-wrap::-webkit-scrollbar { width: 3px; }
-.log-wrap::-webkit-scrollbar-thumb { background: var(--border); }
-.log-entry { display: flex; gap: 10px; padding: 4px 2px; border-bottom: 1px solid rgba(30,48,80,0.3); font-family: monospace; font-size: 11px; }
-.log-time { color: var(--text-dim); white-space: nowrap; }
-.log-info    { color: var(--text); }
-.log-success { color: var(--green); }
-.log-warning { color: var(--yellow); }
-.log-danger  { color: var(--red); }
-
-/* ── POPUP ALERT ── */
-#alert-popup {
-  position: fixed; top: 80px; right: 20px; z-index: 999;
-  background: var(--surface); border: 1px solid var(--red);
-  border-radius: 10px; padding: 16px 20px;
-  min-width: 320px; max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,51,85,0.2);
-  display: none;
-  animation: slideIn 0.3s ease;
-}
-#alert-popup.visible { display: block; }
-@keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:none} }
-.popup-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.popup-icon { font-size: 22px; }
-.popup-title { font-size: 13px; font-weight: 700; color: var(--red); }
-.popup-msg { font-size: 12px; color: var(--text-mid); line-height: 1.5; }
-.popup-close {
-  position: absolute; top: 10px; right: 12px;
-  background: none; border: none; color: var(--text-dim);
-  font-size: 16px; cursor: pointer; line-height: 1;
-}
-.popup-close:hover { color: var(--text); }
-.popup-time { font-size: 10px; color: var(--text-dim); margin-top: 8px; font-family: monospace; }
-
-/* ── EXPLAIN BOX ── */
-.explain {
-  background: var(--surface2); border-left: 3px solid var(--blue-dim);
-  border-radius: 0 6px 6px 0; padding: 9px 12px;
-  font-size: 11px; color: var(--text-dim); line-height: 1.6;
-  margin-bottom: 12px;
-}
-.explain strong { color: var(--cyan); }
-
-/* ── SEP ── */
-.sep { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;font-size:13px;min-height:100vh;}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
+.header-left{display:flex;align-items:center;gap:16px;}
+.logo-mark{width:36px;height:36px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;}
+.logo-text h1{font-size:16px;font-weight:700;color:#fff;letter-spacing:1px;}
+.logo-text p{font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;}
+.header-right{display:flex;align-items:center;gap:12px;}
+#clock{font-size:13px;color:var(--cyan);font-family:monospace;}
+#agent-pill{padding:4px 12px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:#1a2a3a;border:1px solid var(--border);color:var(--text-dim);}
+#agent-pill.online{background:rgba(0,214,143,0.12);border-color:var(--green);color:var(--green);}
+.btn-emergency{padding:7px 16px;border-radius:6px;border:1px solid var(--red);background:rgba(255,51,85,0.1);color:var(--red);font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase;}
+.btn-emergency:hover{background:rgba(255,51,85,0.25);}
+.stats-bar{background:var(--surface2);border-bottom:1px solid var(--border);padding:10px 20px;display:grid;grid-template-columns:repeat(6,1fr);gap:1px;}
+.stat-item{padding:6px 16px;border-right:1px solid var(--border);text-align:center;}
+.stat-item:last-child{border-right:none;}
+.stat-item .val{font-size:20px;font-weight:700;font-family:monospace;line-height:1;}
+.stat-item .lbl{font-size:9px;color:var(--text-dim);margin-top:3px;letter-spacing:1px;text-transform:uppercase;}
+.c-blue{color:var(--blue);}.c-cyan{color:var(--cyan);}.c-green{color:var(--green);}
+.c-red{color:var(--red);}.c-yellow{color:var(--yellow);}.c-orange{color:var(--orange);}.c-white{color:#fff;}
+#ids-bar{background:rgba(255,51,85,0.08);border-bottom:1px solid rgba(255,51,85,0.3);padding:8px 20px;display:none;align-items:center;gap:12px;}
+#ids-bar.visible{display:flex;}
+.ids-icon{font-size:16px;}
+#ids-text{font-size:12px;color:var(--red);font-weight:600;flex:1;}
+.ids-badge{padding:3px 10px;border-radius:4px;font-size:10px;font-weight:700;background:var(--red);color:#fff;letter-spacing:1px;}
+.main{padding:16px;display:grid;gap:14px;max-width:1600px;margin:0 auto;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:1100px){.grid-2{grid-template-columns:1fr;}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.panel-head{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.015);}
+.panel-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.panel-title .dot-ind{width:6px;height:6px;border-radius:50%;background:var(--blue);}
+.panel-body{padding:14px;}
+#topology{width:100%;height:275px;}
+.pill{padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.pill-idle{background:#1a2535;border:1px solid var(--border);color:var(--text-dim);}
+.pill-active{background:rgba(255,51,85,0.2);border:2px solid var(--red);color:var(--red);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.pill-active{animation:blink 0.8s infinite;}
+.pill-ok{background:rgba(0,214,143,0.12);border:1px solid var(--green);color:var(--green);}
+.form-grid{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:center;margin-bottom:12px;}
+.form-grid label{font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.form-grid input,.form-grid select{background:#08111e;border:1px solid var(--border);border-radius:5px;color:var(--text);padding:5px 9px;font-size:12px;font-family:monospace;width:100%;}
+.btn-row{display:flex;gap:8px;margin-bottom:14px;}
+.btn{padding:7px 16px;border:none;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase;}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-danger:disabled{opacity:0.35;cursor:not-allowed;}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-mid);}
+.btn-ghost:hover:not(:disabled){background:var(--surface2);}
+.btn-ghost:disabled{opacity:0.35;cursor:not-allowed;}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.metric{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px;text-align:center;}
+.metric .mv{font-size:22px;font-weight:700;font-family:monospace;line-height:1;}
+.metric .ml{font-size:9px;color:var(--text-dim);margin-top:3px;letter-spacing:1px;text-transform:uppercase;}
+.pkt-wrap{border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.pkt-head-row{display:grid;grid-template-columns:58px 105px 105px 55px 1fr 50px;padding:5px 10px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:9px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;}
+.pkt-scroll{max-height:200px;overflow-y:auto;}
+.pkt-scroll::-webkit-scrollbar{width:3px;}
+.pkt-scroll::-webkit-scrollbar-thumb{background:var(--border);}
+.pkt-row{display:grid;grid-template-columns:58px 105px 105px 55px 1fr 50px;padding:4px 10px;border-bottom:1px solid rgba(30,48,80,0.4);font-size:10px;font-family:monospace;}
+.pkt-empty{padding:20px;text-align:center;color:var(--text-dim);font-size:11px;}
+.ph{color:var(--green);}.pd{color:var(--cyan);}.pt{color:var(--yellow);}.pa{color:var(--orange);}.po{color:var(--text-dim);}
+.chart-wrap{position:relative;height:160px;margin-top:8px;}
+.chart-lbl{font-size:9px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.hist-table{width:100%;border-collapse:collapse;font-size:11px;}
+.hist-table th{padding:7px 10px;text-align:left;font-size:9px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2);}
+.hist-table td{padding:7px 10px;border-bottom:1px solid rgba(30,48,80,0.4);font-family:monospace;font-size:11px;}
+.hist-wrap{max-height:220px;overflow-y:auto;}
+.hist-empty{padding:24px;text-align:center;color:var(--text-dim);}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:1px;}
+.tag-mitm{background:rgba(255,187,0,0.15);color:var(--yellow);}
+.tag-ddos{background:rgba(255,51,85,0.15);color:var(--red);}
+.tag-ended{background:rgba(0,214,143,0.12);color:var(--green);}
+.log-wrap{max-height:180px;overflow-y:auto;}
+.log-wrap::-webkit-scrollbar{width:3px;}
+.log-wrap::-webkit-scrollbar-thumb{background:var(--border);}
+.log-entry{display:flex;gap:10px;padding:4px 2px;border-bottom:1px solid rgba(30,48,80,0.3);font-family:monospace;font-size:11px;}
+.log-time{color:var(--text-dim);white-space:nowrap;}
+.log-info{color:var(--text);}.log-success{color:var(--green);}.log-warning{color:var(--yellow);}.log-danger{color:var(--red);}
+.explain{background:var(--surface2);border-left:3px solid var(--blue-dim);border-radius:0 6px 6px 0;padding:9px 12px;font-size:11px;color:var(--text-dim);line-height:1.6;margin-bottom:12px;}
+.explain strong{color:var(--cyan);}
+.sep{border:none;border-top:1px solid var(--border);margin:12px 0;}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════ POPUP ALERT ═══════════════ -->
-<div id="alert-popup">
-  <button class="popup-close" onclick="closeAlert()">✕</button>
-  <div class="popup-header">
-    <span class="popup-icon">🚨</span>
-    <span class="popup-title" id="popup-title">INTRUSION DETECTED</span>
+<!-- ALERTE BANNER -->
+<div id="alert-banner" style="display:none;position:fixed;top:56px;left:0;right:0;z-index:9999;background:#ff3355;color:#fff;padding:14px 24px;font-family:monospace;font-size:14px;font-weight:700;border-bottom:3px solid #cc0022;box-shadow:0 4px 20px rgba(255,51,85,0.6);">
+  <div style="display:flex;align-items:center;justify-content:space-between;max-width:1600px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <span style="font-size:24px;">🚨</span>
+      <div>
+        <div id="alert-title" style="font-size:16px;letter-spacing:2px;">INTRUSION DETECTED</div>
+        <div id="alert-msg" style="font-size:12px;font-weight:400;margin-top:3px;opacity:0.9;">Attack detected.</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <span id="alert-time" style="font-size:12px;opacity:0.8;">--:--:--</span>
+      <button onclick="closeAlert()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.5);color:#fff;padding:6px 16px;border-radius:4px;cursor:pointer;font-family:monospace;font-size:12px;font-weight:700;">✕ DISMISS</button>
+    </div>
   </div>
-  <div class="popup-msg" id="popup-msg">Attack detected on the network.</div>
-  <div class="popup-time" id="popup-time">--:--:--</div>
 </div>
 
-<!-- ═══════════════ HEADER ═══════════════ -->
+<!-- HEADER -->
 <div class="header">
   <div class="header-left">
     <div class="logo-mark">CS</div>
     <div class="logo-text">
       <h1>CYBERLAB IDS</h1>
-      <p>Network Intrusion Detection & Simulation Platform</p>
+      <p>Network Intrusion Detection &amp; Simulation Platform</p>
     </div>
   </div>
   <div class="header-right">
@@ -318,45 +133,27 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial
   </div>
 </div>
 
-<!-- ═══════════════ STATS BAR ═══════════════ -->
+<!-- STATS BAR -->
 <div class="stats-bar">
-  <div class="stat-item">
-    <div class="val c-white" id="gs-status">IDLE</div>
-    <div class="lbl">System Status</div>
-  </div>
-  <div class="stat-item">
-    <div class="val c-green" id="gs-agents">0 / 1</div>
-    <div class="lbl">Agents Online</div>
-  </div>
-  <div class="stat-item">
-    <div class="val c-yellow" id="gs-pkts">0</div>
-    <div class="lbl">Pkts Intercepted</div>
-  </div>
-  <div class="stat-item">
-    <div class="val c-red" id="gs-pps">0</div>
-    <div class="lbl">DDoS pkt/s</div>
-  </div>
-  <div class="stat-item">
-    <div class="val c-cyan" id="gs-alerts">0</div>
-    <div class="lbl">IDS Alerts</div>
-  </div>
-  <div class="stat-item">
-    <div class="val c-orange" id="gs-sessions">0</div>
-    <div class="lbl">Attack Sessions</div>
-  </div>
+  <div class="stat-item"><div class="val c-white" id="gs-status">IDLE</div><div class="lbl">System Status</div></div>
+  <div class="stat-item"><div class="val c-green" id="gs-agents">0 / 1</div><div class="lbl">Agents Online</div></div>
+  <div class="stat-item"><div class="val c-yellow" id="gs-pkts">0</div><div class="lbl">Pkts Intercepted</div></div>
+  <div class="stat-item"><div class="val c-red" id="gs-pps">0</div><div class="lbl">DDoS pkt/s</div></div>
+  <div class="stat-item"><div class="val c-cyan" id="gs-alerts">0</div><div class="lbl">IDS Alerts</div></div>
+  <div class="stat-item"><div class="val c-orange" id="gs-sessions">0</div><div class="lbl">Attack Sessions</div></div>
 </div>
 
-<!-- ═══════════════ IDS ALERT BAR ═══════════════ -->
+<!-- IDS BAR -->
 <div id="ids-bar">
   <span class="ids-icon">🛡️</span>
-  <span id="ids-text">Anomaly detected on the network.</span>
+  <span id="ids-text">Anomaly detected.</span>
   <span class="ids-badge">IDS ALERT</span>
 </div>
 
-<!-- ═══════════════ MAIN ═══════════════ -->
+<!-- MAIN -->
 <div class="main">
 
-  <!-- TOPOLOGIE -->
+  <!-- TOPOLOGY -->
   <div class="panel">
     <div class="panel-head">
       <div class="panel-title"><span class="dot-ind"></span>Network Topology</div>
@@ -364,92 +161,56 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial
     </div>
     <div class="panel-body" style="padding:10px 14px 8px">
       <svg id="topology" viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg">
-
-        <!-- ── Liens WiFi AP → noeuds (pointillés = sans fil) ── -->
         <line id="link-sw-srv" x1="430" y1="88" x2="158" y2="148" stroke="#1e3050" stroke-width="1.5" stroke-dasharray="5,4"/>
         <line id="link-sw-att" x1="430" y1="92" x2="158" y2="215" stroke="#1e3050" stroke-width="1.5" stroke-dasharray="5,4"/>
         <line id="link-sw-vic" x1="470" y1="88" x2="742" y2="148" stroke="#1e3050" stroke-width="1.5" stroke-dasharray="5,4"/>
-
-        <!-- ── Labels WiFi sur les liens ── -->
         <text x="272" y="113" fill="#4e6a8a" font-size="8" font-family="Consolas" text-anchor="middle">WiFi</text>
         <text x="262" y="168" fill="#4e6a8a" font-size="8" font-family="Consolas" text-anchor="middle">WiFi</text>
         <text x="628" y="110" fill="#4e6a8a" font-size="8" font-family="Consolas" text-anchor="middle">WiFi</text>
-
-        <!-- ── Arc ARP Poisoning (MITM) ── -->
-        <path id="mitm-arc" d="M 155 128 Q 450 60 745 128"
-              fill="none" stroke="#ff3355" stroke-width="1.5" stroke-dasharray="5,4" opacity="0">
+        <path id="mitm-arc" d="M 155 128 Q 450 60 745 128" fill="none" stroke="#ff3355" stroke-width="1.5" stroke-dasharray="5,4" opacity="0">
           <animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1s" repeatCount="indefinite"/>
         </path>
-        <text id="mitm-arc-lbl" x="450" y="52" text-anchor="middle"
-              fill="#ff3355" font-size="9" font-family="Consolas" opacity="0">◄ ARP SPOOFING ►</text>
-
-        <!-- ── Badge MAN IN THE MIDDLE ── -->
-        <rect id="mitm-badge-rect" x="335" y="240" width="230" height="18" rx="9"
-              fill="rgba(255,51,85,0.1)" stroke="#ff3355" stroke-width="1" opacity="0"/>
-        <text id="mitm-badge-txt" x="450" y="253" text-anchor="middle"
-              fill="#ff3355" font-size="9" font-family="Consolas" letter-spacing="1" opacity="0">◄ MAN IN THE MIDDLE ►</text>
-
-        <!-- ══════════════════════════════════ -->
-        <!-- WiFi ACCESS POINT (centre haut)   -->
-        <!-- ══════════════════════════════════ -->
-
-        <!-- Ondes WiFi animées -->
-        <path d="M 432 52 Q 450 38 468 52" fill="none" stroke="#1e6fff" stroke-width="2.5" stroke-linecap="round">
-          <animate attributeName="opacity" values="0.4;1;0.4" dur="1.4s" repeatCount="indefinite"/>
-        </path>
-        <path d="M 420 63 Q 450 36 480 63" fill="none" stroke="#1e6fff" stroke-width="2" stroke-linecap="round">
-          <animate attributeName="opacity" values="0.2;0.8;0.2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
-        </path>
-        <path d="M 408 74 Q 450 34 492 74" fill="none" stroke="#1e6fff" stroke-width="1.5" stroke-linecap="round">
-          <animate attributeName="opacity" values="0.1;0.5;0.1" dur="1.4s" begin="0.6s" repeatCount="indefinite"/>
-        </path>
-
-        <!-- Point antenne -->
+        <text id="mitm-arc-lbl" x="450" y="52" text-anchor="middle" fill="#ff3355" font-size="9" font-family="Consolas" opacity="0">◄ ARP SPOOFING ►</text>
+        <rect id="mitm-badge-rect" x="335" y="240" width="230" height="18" rx="9" fill="rgba(255,51,85,0.1)" stroke="#ff3355" stroke-width="1" opacity="0"/>
+        <text id="mitm-badge-txt" x="450" y="253" text-anchor="middle" fill="#ff3355" font-size="9" font-family="Consolas" letter-spacing="1" opacity="0">◄ MAN IN THE MIDDLE ►</text>
+        <!-- WiFi waves -->
+        <path d="M 432 52 Q 450 38 468 52" fill="none" stroke="#1e6fff" stroke-width="2.5" stroke-linecap="round"><animate attributeName="opacity" values="0.4;1;0.4" dur="1.4s" repeatCount="indefinite"/></path>
+        <path d="M 420 63 Q 450 36 480 63" fill="none" stroke="#1e6fff" stroke-width="2" stroke-linecap="round"><animate attributeName="opacity" values="0.2;0.8;0.2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/></path>
+        <path d="M 408 74 Q 450 34 492 74" fill="none" stroke="#1e6fff" stroke-width="1.5" stroke-linecap="round"><animate attributeName="opacity" values="0.1;0.5;0.1" dur="1.4s" begin="0.6s" repeatCount="indefinite"/></path>
         <circle cx="450" cy="76" r="5" fill="#1e6fff"/>
-
-        <!-- Boîtier WiFi AP -->
+        <!-- WiFi AP box -->
         <rect x="396" y="78" width="108" height="30" rx="6" fill="#0f1729" stroke="#1e6fff" stroke-width="2"/>
-        <!-- Leds -->
         <circle cx="414" cy="93" r="3.5" fill="#00d68f"><animate attributeName="opacity" values="1;0.2;1" dur="2s" repeatCount="indefinite"/></circle>
         <circle cx="427" cy="93" r="3.5" fill="#1e6fff"><animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" repeatCount="indefinite"/></circle>
         <circle cx="440" cy="93" r="3.5" fill="#ffbb00"><animate attributeName="opacity" values="1;0.3;1" dur="0.7s" repeatCount="indefinite"/></circle>
         <text x="459" y="89" fill="#1e6fff" font-size="9" font-family="Consolas" font-weight="bold">WiFi AP</text>
         <text x="459" y="100" fill="#4e6a8a" font-size="7" font-family="Consolas">cyberlab</text>
-        <text x="450" y="122" id="sw-status" text-anchor="middle" fill="#1e6fff" font-size="8" font-family="Consolas">192.168.100.0/24</text>
-
-        <!-- ══════════════════════════════════ -->
-        <!-- NODES                             -->
-        <!-- ══════════════════════════════════ -->
-
-        <!-- SERVER (gauche haut) -->
+        <text x="450" y="122" text-anchor="middle" fill="#1e6fff" font-size="8" font-family="Consolas">192.168.100.0/24</text>
+        <!-- SERVER -->
         <circle id="node-server" cx="120" cy="155" r="35" fill="#0f1729" stroke="#00d68f" stroke-width="2"/>
         <text x="120" y="144" text-anchor="middle" fill="#00d68f" font-size="16">🖥️</text>
         <text x="120" y="160" text-anchor="middle" fill="#00d68f" font-size="10" font-family="Consolas" font-weight="bold">SERVER</text>
         <text x="120" y="172" text-anchor="middle" fill="#4e6a8a" font-size="8" font-family="Consolas">.100.1</text>
         <text x="120" y="200" id="srv-st" text-anchor="middle" fill="#00d68f" font-size="8" font-family="Consolas">ONLINE</text>
-
-        <!-- ATTACKER (gauche bas) -->
+        <!-- ATTACKER -->
         <circle id="node-attacker" cx="120" cy="225" r="35" fill="#0f1729" stroke="#4e6a8a" stroke-width="2"/>
         <text x="120" y="214" text-anchor="middle" fill="#4e6a8a" font-size="16">⚔️</text>
         <text x="120" y="230" text-anchor="middle" fill="#4e6a8a" font-size="10" font-family="Consolas" font-weight="bold">ATTACKER</text>
         <text x="120" y="242" text-anchor="middle" fill="#4e6a8a" font-size="8" font-family="Consolas">.100.3</text>
         <text x="120" y="257" id="att-st" text-anchor="middle" fill="#4e6a8a" font-size="8" font-family="Consolas">OFFLINE</text>
-
-        <!-- VICTIM (droite) -->
+        <!-- VICTIM -->
         <circle id="node-victim" cx="780" cy="155" r="35" fill="#0f1729" stroke="#00cfff" stroke-width="2"/>
         <text x="780" y="144" text-anchor="middle" fill="#00cfff" font-size="16">💻</text>
         <text x="780" y="160" text-anchor="middle" fill="#00cfff" font-size="10" font-family="Consolas" font-weight="bold">VICTIM</text>
         <text x="780" y="172" text-anchor="middle" fill="#4e6a8a" font-size="8" font-family="Consolas">.100.2</text>
         <text x="780" y="200" id="vic-st" text-anchor="middle" fill="#4e6a8a" font-size="8" font-family="Consolas">NORMAL</text>
-
       </svg>
     </div>
   </div>
 
   <!-- ATTAQUES -->
   <div class="grid-2">
-
-    <!-- ═══ MITM ═══ -->
+    <!-- MITM -->
     <div class="panel">
       <div class="panel-head">
         <div class="panel-title"><span class="dot-ind" style="background:var(--yellow)"></span>MITM — ARP Spoofing</div>
@@ -457,26 +218,18 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial
       </div>
       <div class="panel-body">
         <div class="form-grid">
-          <label>Victim IP</label>
-          <input type="text" id="mitm-victim-ip" value="192.168.100.2"/>
-          <label>Gateway IP</label>
-          <input type="text" id="mitm-gw-ip" value="192.168.100.1"/>
+          <label>Victim IP</label><input type="text" id="mitm-victim-ip" value="192.168.100.2"/>
+          <label>Gateway IP</label><input type="text" id="mitm-gw-ip" value="192.168.100.1"/>
         </div>
         <div class="btn-row">
           <button class="btn btn-danger" id="btn-mitm-start" onclick="launchMITM()">▶ LAUNCH MITM</button>
-          <button class="btn btn-ghost"  id="btn-mitm-stop"  onclick="stopMITM()" disabled>⏹ STOP</button>
+          <button class="btn btn-ghost" id="btn-mitm-stop" onclick="stopMITM()" disabled>⏹ STOP</button>
         </div>
         <hr class="sep">
-        <div class="explain">
-          <strong>How it works:</strong> The attacker sends forged ARP Reply packets to both the victim and the gateway,
-          mapping its own MAC address to both IPs. All traffic is redirected through the attacker — invisible to the victim.
-        </div>
+        <div class="explain"><strong>How it works:</strong> The attacker sends forged ARP Reply packets to the victim and the gateway, associating its MAC to both IPs. All traffic passes through the attacker — invisible to the victim.</div>
         <div class="metrics">
           <div class="metric"><div class="mv c-yellow" id="mitm-pkt-count">0</div><div class="ml">Pkts Intercepted</div></div>
-          <div class="metric">
-            <div class="mv" id="mitm-arp-st" style="font-size:13px;color:var(--text-dim)">Inactive</div>
-            <div class="ml">ARP Poisoning</div>
-          </div>
+          <div class="metric"><div class="mv" id="mitm-arp-st" style="font-size:13px;color:var(--text-dim)">Inactive</div><div class="ml">ARP Poisoning</div></div>
           <div class="metric"><div class="mv c-cyan" id="mitm-proto">—</div><div class="ml">Protocols Seen</div></div>
         </div>
         <div class="pkt-wrap">
@@ -486,7 +239,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial
       </div>
     </div>
 
-    <!-- ═══ DDoS ═══ -->
+    <!-- DDoS -->
     <div class="panel">
       <div class="panel-head">
         <div class="panel-title"><span class="dot-ind" style="background:var(--red)"></span>DDoS — Packet Flood</div>
@@ -494,26 +247,21 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial
       </div>
       <div class="panel-body">
         <div class="form-grid">
-          <label>Target IP</label>
-          <input type="text" id="ddos-target-ip" value="192.168.100.2"/>
+          <label>Target IP</label><input type="text" id="ddos-target-ip" value="192.168.100.2"/>
           <label>Flood Type</label>
           <select id="ddos-type">
             <option value="udp">UDP Flood</option>
             <option value="icmp">ICMP Flood</option>
             <option value="syn">SYN Flood</option>
           </select>
-          <label>Target PPS</label>
-          <input type="number" id="ddos-pps" value="500" min="10" max="5000"/>
+          <label>Target PPS</label><input type="number" id="ddos-pps" value="500" min="10" max="5000"/>
         </div>
         <div class="btn-row">
           <button class="btn btn-danger" id="btn-ddos-start" onclick="launchDDoS()">▶ LAUNCH DDoS</button>
-          <button class="btn btn-ghost"  id="btn-ddos-stop"  onclick="stopDDoS()" disabled>⏹ STOP</button>
+          <button class="btn btn-ghost" id="btn-ddos-stop" onclick="stopDDoS()" disabled>⏹ STOP</button>
         </div>
         <hr class="sep">
-        <div class="explain">
-          <strong>How it works:</strong> The attacker sends a massive volume of packets toward the victim to saturate
-          its bandwidth and CPU. The victim becomes unable to respond to legitimate requests.
-        </div>
+        <div class="explain"><strong>How it works:</strong> The attacker sends a massive volume of packets toward the victim to saturate its bandwidth and CPU. The victim becomes unable to respond to legitimate requests.</div>
         <div class="metrics">
           <div class="metric"><div class="mv c-red" id="ddos-pps-val">0</div><div class="ml">Pkt/s</div></div>
           <div class="metric"><div class="mv c-cyan" id="ddos-mbps-val">0.00</div><div class="ml">Mbit/s</div></div>
@@ -523,13 +271,10 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial
         <div class="chart-wrap"><canvas id="ddos-chart"></canvas></div>
       </div>
     </div>
-
   </div>
 
   <!-- HISTORY + LOG -->
   <div class="grid-2">
-
-    <!-- HISTORIQUE -->
     <div class="panel">
       <div class="panel-head">
         <div class="panel-title"><span class="dot-ind" style="background:var(--cyan)"></span>Attack History</div>
@@ -544,8 +289,6 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial
         </div>
       </div>
     </div>
-
-    <!-- LOG -->
     <div class="panel">
       <div class="panel-head">
         <div class="panel-title"><span class="dot-ind" style="background:var(--text-dim)"></span>Event Log</div>
@@ -557,54 +300,36 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial
         </div>
       </div>
     </div>
-
   </div>
 
 </div>
 
 <script>
 const socket = io();
-const svgEl  = document.getElementById('topology');
+const svgEl = document.getElementById('topology');
+let protosSeen = new Set();
+let alertCount = 0, sessionCount = 0;
+let mitmStartTime = null, ddosStartTime = null;
+let historyRows = [], mitmAnimTimer = null, ddosAnimTimer = null;
 
-// ── State ──────────────────────────────────────────────────────
-let protosSeen   = new Set();
-let alertCount   = 0;
-let sessionCount = 0;
-let mitmStart    = null;
-let ddosStart    = null;
-let historyRows  = [];
-let mitmAnimTimer = null;
-let ddosAnimTimer = null;
-
-// ── Clock ──────────────────────────────────────────────────────
 setInterval(() => {
   document.getElementById('clock').textContent = new Date().toLocaleTimeString('fr-FR');
 }, 1000);
 
-// ── Chart ──────────────────────────────────────────────────────
 const ctx = document.getElementById('ddos-chart').getContext('2d');
 const ddosChart = new Chart(ctx, {
   type: 'line',
   data: {
     labels: Array(40).fill(''),
-    datasets: [{
-      data: Array(40).fill(0),
-      borderColor: '#ff3355',
-      backgroundColor: 'rgba(255,51,85,0.08)',
-      borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: true,
-    }]
+    datasets: [{ data: Array(40).fill(0), borderColor: '#ff3355', backgroundColor: 'rgba(255,51,85,0.08)', borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: true }]
   },
   options: {
     animation: false, responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: false } },
-    scales: {
-      x: { display: false },
-      y: { beginAtZero: true,
-           grid: { color: 'rgba(30,48,80,0.6)' },
-           ticks: { color: '#4e6a8a', font: { size: 9 } } }
-    }
+    scales: { x: { display: false }, y: { beginAtZero: true, grid: { color: 'rgba(30,48,80,0.6)' }, ticks: { color: '#4e6a8a', font: { size: 9 } } } }
   }
 });
+
 function pushChart(v) {
   ddosChart.data.datasets[0].data.push(v);
   ddosChart.data.datasets[0].data.shift();
@@ -613,11 +338,10 @@ function pushChart(v) {
   ddosChart.update();
 }
 
-// ── SVG Packet animation ───────────────────────────────────────
 function animPkt(x1, y1, x2, y2, color, r) {
-  const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   c.setAttribute('cx', x1); c.setAttribute('cy', y1);
-  c.setAttribute('r', r||5); c.setAttribute('fill', color);
+  c.setAttribute('r', r || 5); c.setAttribute('fill', color);
   svgEl.appendChild(c);
   const dur = 700, t0 = performance.now();
   function step(now) {
@@ -626,20 +350,16 @@ function animPkt(x1, y1, x2, y2, color, r) {
     c.setAttribute('cy', y1 + (y2 - y1) * t);
     c.setAttribute('opacity', t > 0.8 ? String(1 - (t - 0.8) / 0.2) : '1');
     if (t < 1) requestAnimationFrame(step);
-    else { try { svgEl.removeChild(c); } catch(e){} }
+    else { try { svgEl.removeChild(c); } catch(e) {} }
   }
   requestAnimationFrame(step);
 }
 
-// WiFi AP: 450,88 | Server: 120,155 | Attacker: 120,225 | Victim: 780,155
-
 function startMITMAnim() {
   if (mitmAnimTimer) return;
   mitmAnimTimer = setInterval(() => {
-    // Attacker → AP → Server (jaune = intercepté)
     animPkt(120, 225, 450, 88, '#ffbb00', 4);
     setTimeout(() => animPkt(450, 88, 120, 155, '#ffbb00', 4), 380);
-    // Attacker → AP → Victim (rouge)
     setTimeout(() => animPkt(120, 225, 450, 88, '#ff3355', 4), 200);
     setTimeout(() => animPkt(450, 88, 780, 155, '#ff3355', 4), 580);
   }, 1200);
@@ -649,91 +369,63 @@ function stopMITMAnim() { clearInterval(mitmAnimTimer); mitmAnimTimer = null; }
 function startDDoSAnim() {
   if (ddosAnimTimer) return;
   ddosAnimTimer = setInterval(() => {
-    // Rafale Attacker → AP → Victim
-    [0, 80, 160, 240, 320].forEach(delay =>
-      setTimeout(() => animPkt(120, 225, 450, 88, '#ff7733', 4), delay)
-    );
+    [0, 80, 160, 240, 320].forEach(d => setTimeout(() => animPkt(120, 225, 450, 88, '#ff7733', 4), d));
     setTimeout(() => {
-      [0, 80, 160, 240].forEach(delay =>
-        setTimeout(() => animPkt(450, 88, 780, 155, '#ff7733', 4), delay)
-      );
+      [0, 80, 160, 240].forEach(d => setTimeout(() => animPkt(450, 88, 780, 155, '#ff7733', 4), d));
     }, 420);
   }, 600);
 }
 function stopDDoSAnim() { clearInterval(ddosAnimTimer); ddosAnimTimer = null; }
 
-// ── IDS Alert system ──────────────────────────────────────────
 function idsAlert(title, msg) {
   alertCount++;
   document.getElementById('gs-alerts').textContent = alertCount;
-
-  // Popup
-  document.getElementById('popup-title').textContent = title;
-  document.getElementById('popup-msg').textContent   = msg;
-  document.getElementById('popup-time').textContent  = new Date().toLocaleTimeString('fr-FR');
-  document.getElementById('alert-popup').classList.add('visible');
-  setTimeout(() => document.getElementById('alert-popup').classList.remove('visible'), 7000);
-
-  // IDS bar
+  document.getElementById('alert-title').textContent = '🚨 ' + title;
+  document.getElementById('alert-msg').textContent = msg;
+  document.getElementById('alert-time').textContent = new Date().toLocaleTimeString('fr-FR');
+  document.getElementById('alert-banner').style.display = 'block';
   document.getElementById('ids-text').textContent = msg;
   document.getElementById('ids-bar').classList.add('visible');
-
-  // System status
   document.getElementById('gs-status').textContent = 'THREAT';
-  document.getElementById('gs-status').className = 'val c-red';
-
-  // Beep sound
+  document.getElementById('gs-status').style.color = '#ff3355';
   try {
-    const ctx2 = new (window.AudioContext || window.webkitAudioContext)();
+    const actx = new (window.AudioContext || window.webkitAudioContext)();
     [880, 660, 880].forEach((freq, i) => {
-      const osc = ctx2.createOscillator();
-      const gain = ctx2.createGain();
-      osc.connect(gain); gain.connect(ctx2.destination);
-      osc.frequency.value = freq;
-      osc.type = 'sine';
-      gain.gain.setValueAtTime(0.15, ctx2.currentTime + i * 0.15);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime + i * 0.15 + 0.12);
-      osc.start(ctx2.currentTime + i * 0.15);
-      osc.stop(ctx2.currentTime + i * 0.15 + 0.12);
+      const osc = actx.createOscillator(), gain = actx.createGain();
+      osc.connect(gain); gain.connect(actx.destination);
+      osc.frequency.value = freq; osc.type = 'square';
+      gain.gain.setValueAtTime(0.1, actx.currentTime + i * 0.18);
+      gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + i * 0.18 + 0.15);
+      osc.start(actx.currentTime + i * 0.18);
+      osc.stop(actx.currentTime + i * 0.18 + 0.15);
     });
   } catch(e) {}
 }
-function closeAlert() {
-  document.getElementById('alert-popup').classList.remove('visible');
+
+function closeAlert() { document.getElementById('alert-banner').style.display = 'none'; }
+
+function clearThreat() {
+  document.getElementById('alert-banner').style.display = 'none';
+  document.getElementById('ids-bar').classList.remove('visible');
+  document.getElementById('gs-status').textContent = 'IDLE';
+  document.getElementById('gs-status').style.color = '#fff';
 }
 
-// ── History ────────────────────────────────────────────────────
 function addHistory(type, target, duration, pkts) {
   historyRows.unshift({ id: ++sessionCount, type, target, duration, pkts, time: new Date().toLocaleTimeString('fr-FR') });
   document.getElementById('gs-sessions').textContent = sessionCount;
-  renderHistory();
-}
-
-function renderHistory() {
   const tbody = document.getElementById('history-body');
-  if (!historyRows.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="hist-empty">No attacks recorded yet.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = historyRows.slice(0, 20).map(r => `
-    <tr>
-      <td style="color:var(--text-dim)">#${r.id}</td>
-      <td>${r.time}</td>
-      <td><span class="tag ${r.type === 'MITM' ? 'tag-mitm' : 'tag-ddos'}">${r.type}</span></td>
-      <td style="color:var(--cyan);font-family:monospace">${r.target}</td>
-      <td style="color:var(--text-mid)">${r.duration}</td>
-      <td><span class="tag tag-ended">ENDED</span></td>
-    </tr>`).join('');
+  tbody.innerHTML = historyRows.slice(0, 20).map(r =>
+    `<tr><td style="color:var(--text-dim)">#${r.id}</td><td>${r.time}</td><td><span class="tag ${r.type==='MITM'?'tag-mitm':'tag-ddos'}">${r.type}</span></td><td style="color:var(--cyan);font-family:monospace">${r.target}</td><td style="color:var(--text-mid)">${r.duration}</td><td><span class="tag tag-ended">ENDED</span></td></tr>`
+  ).join('');
 }
 
 function clearHistory() {
-  historyRows = [];
-  sessionCount = 0;
+  historyRows = []; sessionCount = 0;
   document.getElementById('gs-sessions').textContent = 0;
-  renderHistory();
+  document.getElementById('history-body').innerHTML = '<tr><td colspan="6" class="hist-empty">No attacks recorded yet.</td></tr>';
 }
 
-// ── Log ────────────────────────────────────────────────────────
 function addLog(entry) {
   const c = document.getElementById('log-container');
   const d = document.createElement('div');
@@ -744,12 +436,11 @@ function addLog(entry) {
 }
 function clearLog() { document.getElementById('log-container').innerHTML = ''; }
 
-// ── Packet table ───────────────────────────────────────────────
 function addPkt(pkt) {
   const body = document.getElementById('pkt-body');
   if (body.querySelector('.pkt-empty')) body.innerHTML = '';
   const proto = (pkt.protocol || 'OTHER').toUpperCase();
-  const cls = {'HTTP':'ph','HTTPS':'ph','DNS':'pd','TCP':'pt','ARP':'pa'}[proto] || 'po';
+  const cls = { HTTP:'ph', HTTPS:'ph', DNS:'pd', TCP:'pt', ARP:'pa' }[proto] || 'po';
   const row = document.createElement('div');
   row.className = 'pkt-row';
   row.innerHTML = `<span class="log-time">${pkt.time||'--'}</span><span style="color:var(--text-mid)">${pkt.src||'?'}</span><span style="color:var(--text-mid)">${pkt.dst||'?'}</span><span class="${cls}">${proto}</span><span style="color:var(--text-dim);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${pkt.info||'—'}</span><span style="color:var(--text-dim)">${pkt.size?pkt.size+'B':'—'}</span>`;
@@ -757,95 +448,6 @@ function addPkt(pkt) {
   if (body.children.length > 40) body.removeChild(body.lastChild);
   protosSeen.add(proto);
   document.getElementById('mitm-proto').textContent = protosSeen.size;
-  document.getElementById('gs-pkts').textContent = parseInt(document.getElementById('mitm-pkt-count').textContent || 0) + 1;
-}
-
-// ── Topology update ────────────────────────────────────────────
-function updateTopology(net) {
-  const att = net.attacker, vic = net.victim;
-
-  const aColor = att.status === 'attacking' ? '#ff3355' :
-                 att.status === 'connected'  ? '#1e6fff' : '#4e6a8a';
-  document.getElementById('node-attacker').setAttribute('stroke', aColor);
-  document.getElementById('att-st').setAttribute('fill', aColor);
-  document.getElementById('att-st').textContent = att.status.toUpperCase();
-  const online = att.status !== 'disconnected';
-  document.getElementById('agent-pill').textContent = online ? 'AGENT ONLINE' : 'AGENT OFFLINE';
-  document.getElementById('agent-pill').className = online ? 'online' : '';
-  document.getElementById('gs-agents').textContent = online ? '1 / 1' : '0 / 1';
-
-  const vColor = vic.status === 'compromised'  ? '#ff3355' :
-                 vic.status === 'under_attack'  ? '#ff7733' : '#00cfff';
-  document.getElementById('node-victim').setAttribute('stroke', vColor);
-  document.getElementById('vic-st').setAttribute('fill', vColor);
-  document.getElementById('vic-st').textContent = vic.status.toUpperCase();
-
-  const lc = att.status === 'attacking' ? '#ff3355' : '#1e3050';
-  ['link-sw-srv','link-sw-att','link-sw-vic'].forEach(id =>
-    document.getElementById(id).setAttribute('stroke', lc));
-}
-
-// ── Commands ───────────────────────────────────────────────────
-async function sendCmd(cmd, extra = {}) {
-  await fetch('/api/command', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({command: cmd, ...extra})
-  });
-}
-
-// MITM
-let mitmStartTime = null;
-function launchMITM() {
-  const victim = document.getElementById('mitm-victim-ip').value.trim();
-  const gw     = document.getElementById('mitm-gw-ip').value.trim();
-  sendCmd('start_mitm', {victim_ip: victim, gateway_ip: gw});
-  document.getElementById('btn-mitm-start').disabled = true;
-  document.getElementById('btn-mitm-stop').disabled  = false;
-  setPill('mitm-pill', 'active', '⚡ ACTIVE');
-  mitmStartTime = Date.now();
-}
-function stopMITM() {
-  sendCmd('stop_mitm');
-  document.getElementById('btn-mitm-start').disabled = false;
-  document.getElementById('btn-mitm-stop').disabled  = true;
-  setPill('mitm-pill', 'idle', 'INACTIVE');
-}
-
-// DDoS
-let ddosStartTime = null;
-function launchDDoS() {
-  const target = document.getElementById('ddos-target-ip').value.trim();
-  const type   = document.getElementById('ddos-type').value;
-  const pps    = parseInt(document.getElementById('ddos-pps').value);
-  sendCmd('start_ddos', {target_ip: target, attack_type: type, pps});
-  document.getElementById('btn-ddos-start').disabled = true;
-  document.getElementById('btn-ddos-stop').disabled  = false;
-  setPill('ddos-pill', 'active', '⚡ ACTIVE');
-  ddosStartTime = Date.now();
-}
-function stopDDoS() {
-  sendCmd('stop_ddos');
-  document.getElementById('btn-ddos-start').disabled = false;
-  document.getElementById('btn-ddos-stop').disabled  = true;
-  setPill('ddos-pill', 'idle', 'INACTIVE');
-}
-
-// Emergency stop
-function emergencyStop() {
-  sendCmd('stop_mitm');
-  sendCmd('stop_ddos');
-  document.getElementById('btn-mitm-start').disabled = false;
-  document.getElementById('btn-mitm-stop').disabled  = true;
-  document.getElementById('btn-ddos-start').disabled = false;
-  document.getElementById('btn-ddos-stop').disabled  = true;
-  setPill('mitm-pill', 'idle', 'INACTIVE');
-  setPill('ddos-pill', 'idle', 'INACTIVE');
-  stopMITMAnim(); stopDDoSAnim();
-  hideMITMVisuals();
-  document.getElementById('ids-bar').classList.remove('visible');
-  document.getElementById('gs-status').textContent = 'IDLE';
-  document.getElementById('gs-status').className = 'val c-white';
-  addLog({time: new Date().toLocaleTimeString('fr-FR'), message: '⛔ EMERGENCY STOP — all attacks terminated', level: 'danger'});
 }
 
 function setPill(id, type, text) {
@@ -855,19 +457,72 @@ function setPill(id, type, text) {
 }
 
 function showMITMVisuals() {
-  document.getElementById('mitm-arc').setAttribute('opacity', '1');
-  document.getElementById('mitm-arc-lbl').setAttribute('opacity', '1');
-  document.getElementById('mitm-badge-rect').setAttribute('opacity', '1');
-  document.getElementById('mitm-badge-txt').setAttribute('opacity', '1');
+  ['mitm-arc','mitm-arc-lbl','mitm-badge-rect','mitm-badge-txt'].forEach(id =>
+    document.getElementById(id).setAttribute('opacity', '1'));
 }
 function hideMITMVisuals() {
-  document.getElementById('mitm-arc').setAttribute('opacity', '0');
-  document.getElementById('mitm-arc-lbl').setAttribute('opacity', '0');
-  document.getElementById('mitm-badge-rect').setAttribute('opacity', '0');
-  document.getElementById('mitm-badge-txt').setAttribute('opacity', '0');
+  ['mitm-arc','mitm-arc-lbl','mitm-badge-rect','mitm-badge-txt'].forEach(id =>
+    document.getElementById(id).setAttribute('opacity', '0'));
 }
 
-// ── Socket events ─────────────────────────────────────────────
+function updateTopology(net) {
+  const att = net.attacker, vic = net.victim;
+  const aColor = att.status === 'attacking' ? '#ff3355' : att.status === 'connected' ? '#1e6fff' : '#4e6a8a';
+  document.getElementById('node-attacker').setAttribute('stroke', aColor);
+  document.getElementById('att-st').setAttribute('fill', aColor);
+  document.getElementById('att-st').textContent = att.status.toUpperCase();
+  const online = att.status !== 'disconnected';
+  document.getElementById('agent-pill').textContent = online ? 'AGENT ONLINE' : 'AGENT OFFLINE';
+  document.getElementById('agent-pill').className = online ? 'online' : '';
+  document.getElementById('gs-agents').textContent = online ? '1 / 1' : '0 / 1';
+  const vColor = vic.status === 'compromised' ? '#ff3355' : vic.status === 'under_attack' ? '#ff7733' : '#00cfff';
+  document.getElementById('node-victim').setAttribute('stroke', vColor);
+  document.getElementById('vic-st').setAttribute('fill', vColor);
+  document.getElementById('vic-st').textContent = vic.status.toUpperCase();
+  const lc = att.status === 'attacking' ? '#ff3355' : '#1e3050';
+  ['link-sw-srv','link-sw-att','link-sw-vic'].forEach(id => document.getElementById(id).setAttribute('stroke', lc));
+}
+
+async function sendCmd(cmd, extra = {}) {
+  await fetch('/api/command', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({command: cmd, ...extra}) });
+}
+
+function launchMITM() {
+  sendCmd('start_mitm', { victim_ip: document.getElementById('mitm-victim-ip').value.trim(), gateway_ip: document.getElementById('mitm-gw-ip').value.trim() });
+  document.getElementById('btn-mitm-start').disabled = true;
+  document.getElementById('btn-mitm-stop').disabled = false;
+  setPill('mitm-pill', 'active', '⚡ ACTIVE');
+}
+function stopMITM() {
+  sendCmd('stop_mitm');
+  document.getElementById('btn-mitm-start').disabled = false;
+  document.getElementById('btn-mitm-stop').disabled = true;
+  setPill('mitm-pill', 'idle', 'INACTIVE');
+}
+
+function launchDDoS() {
+  sendCmd('start_ddos', { target_ip: document.getElementById('ddos-target-ip').value.trim(), attack_type: document.getElementById('ddos-type').value, pps: parseInt(document.getElementById('ddos-pps').value) });
+  document.getElementById('btn-ddos-start').disabled = true;
+  document.getElementById('btn-ddos-stop').disabled = false;
+  setPill('ddos-pill', 'active', '⚡ ACTIVE');
+}
+function stopDDoS() {
+  sendCmd('stop_ddos');
+  document.getElementById('btn-ddos-start').disabled = false;
+  document.getElementById('btn-ddos-stop').disabled = true;
+  setPill('ddos-pill', 'idle', 'INACTIVE');
+}
+
+function emergencyStop() {
+  sendCmd('stop_mitm'); sendCmd('stop_ddos');
+  ['btn-mitm-start','btn-ddos-start'].forEach(id => document.getElementById(id).disabled = false);
+  ['btn-mitm-stop','btn-ddos-stop'].forEach(id => document.getElementById(id).disabled = true);
+  setPill('mitm-pill','idle','INACTIVE'); setPill('ddos-pill','idle','INACTIVE');
+  stopMITMAnim(); stopDDoSAnim(); hideMITMVisuals(); clearThreat();
+  mitmStartTime = null; ddosStartTime = null;
+  addLog({ time: new Date().toLocaleTimeString('fr-FR'), message: '⛔ EMERGENCY STOP — all attacks terminated', level: 'danger' });
+}
+
 socket.on('log', addLog);
 socket.on('network_update', updateTopology);
 socket.on('mitm_packet', addPkt);
@@ -875,71 +530,54 @@ socket.on('mitm_packet', addPkt);
 socket.on('mitm_update', data => {
   document.getElementById('mitm-pkt-count').textContent = data.packets_intercepted || 0;
   document.getElementById('gs-pkts').textContent = data.packets_intercepted || 0;
-
   if (data.arp_poisoned) {
     document.getElementById('mitm-arp-st').textContent = '🔴 ACTIVE';
-    document.getElementById('mitm-arp-st').style.color = 'var(--red)';
-    showMITMVisuals();
-    startMITMAnim();
+    document.getElementById('mitm-arp-st').style.color = '#ff3355';
+    showMITMVisuals(); startMITMAnim();
   } else {
     document.getElementById('mitm-arp-st').textContent = 'Inactive';
-    document.getElementById('mitm-arp-st').style.color = 'var(--text-dim)';
-    hideMITMVisuals();
-    stopMITMAnim();
+    document.getElementById('mitm-arp-st').style.color = '#4e6a8a';
+    hideMITMVisuals(); stopMITMAnim();
   }
-
   if (!data.active) {
-    setPill('mitm-pill', 'idle', 'INACTIVE');
+    setPill('mitm-pill','idle','INACTIVE');
     document.getElementById('btn-mitm-start').disabled = false;
-    document.getElementById('btn-mitm-stop').disabled  = true;
+    document.getElementById('btn-mitm-stop').disabled = true;
     stopMITMAnim(); hideMITMVisuals();
     protosSeen.clear();
     document.getElementById('mitm-proto').textContent = '—';
     if (mitmStartTime) {
-      const dur = Math.round((Date.now() - mitmStartTime) / 1000);
-      addHistory('MITM', data.victim_ip || '192.168.100.2', dur + 's', data.packets_intercepted + ' pkts');
+      addHistory('MITM', data.victim_ip || '192.168.100.2', Math.round((Date.now() - mitmStartTime) / 1000) + 's', (data.packets_intercepted || 0) + ' pkts');
       mitmStartTime = null;
     }
-    // IDS: clear threat if no ddos active
-    if (!ddosStartTime) {
-      document.getElementById('ids-bar').classList.remove('visible');
-      document.getElementById('gs-status').textContent = 'IDLE';
-      document.getElementById('gs-status').className = 'val c-white';
-    }
+    if (!ddosStartTime) clearThreat();
   } else if (data.arp_poisoned && !mitmStartTime) {
     mitmStartTime = Date.now();
-    idsAlert('MITM ATTACK DETECTED', 'ARP Spoofing detected — Attacker (192.168.100.3) is intercepting traffic between 192.168.100.2 and 192.168.100.1');
+    idsAlert('MITM ATTACK DETECTED', 'ARP Spoofing active — Attacker (192.168.100.3) intercepting traffic between 192.168.100.2 and 192.168.100.1');
   }
 });
 
 socket.on('ddos_update', data => {
-  document.getElementById('ddos-pps-val').textContent   = (data.pps || 0).toLocaleString();
-  document.getElementById('ddos-mbps-val').textContent  = (data.mbps || 0).toFixed(2);
+  document.getElementById('ddos-pps-val').textContent = (data.pps || 0).toLocaleString();
+  document.getElementById('ddos-mbps-val').textContent = (data.mbps || 0).toFixed(2);
   document.getElementById('ddos-total-val').textContent = (data.total_packets || 0).toLocaleString();
-  document.getElementById('gs-pps').textContent         = (data.pps || 0).toLocaleString();
+  document.getElementById('gs-pps').textContent = (data.pps || 0).toLocaleString();
   pushChart(data.pps || 0);
-
-  if (data.active) { startDDoSAnim(); }
-
+  if (data.active) startDDoSAnim();
   if (!data.active) {
-    setPill('ddos-pill', 'idle', 'INACTIVE');
+    setPill('ddos-pill','idle','INACTIVE');
     document.getElementById('btn-ddos-start').disabled = false;
-    document.getElementById('btn-ddos-stop').disabled  = true;
+    document.getElementById('btn-ddos-stop').disabled = true;
     stopDDoSAnim();
     document.getElementById('gs-pps').textContent = '0';
     if (ddosStartTime) {
-      const dur = Math.round((Date.now() - ddosStartTime) / 1000);
-      addHistory('DDoS', data.target_ip || '192.168.100.2', dur + 's', (data.total_packets || 0).toLocaleString() + ' pkts');
+      addHistory('DDoS', data.target_ip || '192.168.100.2', Math.round((Date.now() - ddosStartTime) / 1000) + 's', (data.total_packets || 0).toLocaleString() + ' pkts');
       ddosStartTime = null;
     }
-    if (!mitmStartTime) {
-      document.getElementById('ids-bar').classList.remove('visible');
-      document.getElementById('gs-status').textContent = 'IDLE';
-      document.getElementById('gs-status').className = 'val c-white';
-    }
+    if (!mitmStartTime) clearThreat();
   } else if (!ddosStartTime) {
     ddosStartTime = Date.now();
-    idsAlert('DDoS ATTACK DETECTED', `${data.attack_type ? data.attack_type.toUpperCase() : 'UDP'} Flood detected — ${(data.pps||0).toLocaleString()} pkt/s targeting 192.168.100.2`);
+    idsAlert('DDoS ATTACK DETECTED', (data.attack_type||'UDP').toUpperCase() + ' Flood — ' + (data.pps||0).toLocaleString() + ' pkt/s targeting 192.168.100.2');
   }
 });
 
@@ -950,14 +588,30 @@ socket.on('ddos_history', history => {
   ddosChart.update();
 });
 
-// Initial load
 (async () => {
   const r = await fetch('/api/state');
   const s = await r.json();
-  if (s.logs)         s.logs.reverse().forEach(addLog);
-  if (s.network)      updateTopology(s.network);
-  if (s.packets)      s.packets.forEach(addPkt);
+  if (s.logs) s.logs.reverse().forEach(addLog);
+  if (s.network) updateTopology(s.network);
+  if (s.packets) s.packets.forEach(addPkt);
   if (s.ddos_history) s.ddos_history.forEach(h => pushChart(h.pps));
+  if (s.ddos && s.ddos.active) {
+    setPill('ddos-pill','active','⚡ ACTIVE');
+    document.getElementById('btn-ddos-start').disabled = true;
+    document.getElementById('btn-ddos-stop').disabled = false;
+    startDDoSAnim();
+    document.getElementById('ddos-pps-val').textContent = (s.ddos.pps||0).toLocaleString();
+    document.getElementById('ddos-mbps-val').textContent = (s.ddos.mbps||0).toFixed(2);
+    document.getElementById('ddos-total-val').textContent = (s.ddos.total_packets||0).toLocaleString();
+  }
+  if (s.mitm && s.mitm.active) {
+    setPill('mitm-pill','active','⚡ ACTIVE');
+    document.getElementById('btn-mitm-start').disabled = true;
+    document.getElementById('btn-mitm-stop').disabled = false;
+    if (s.mitm.arp_poisoned) { showMITMVisuals(); startMITMAnim(); }
+    document.getElementById('mitm-pkt-count').textContent = s.mitm.packets_intercepted||0;
+    document.getElementById('gs-pkts').textContent = s.mitm.packets_intercepted||0;
+  }
 })();
 </script>
 </body>
