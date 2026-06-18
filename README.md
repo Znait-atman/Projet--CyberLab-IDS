@@ -1,7 +1,7 @@
 # CyberLab IDS
 
 > WiFi Network Attack Simulation & Visual Monitoring Platform  
-> Master 1 Cybersecurity — Université Paris Cité — 2025/2026
+
 
 ---
 
@@ -64,6 +64,3 @@ sudo venv/bin/python3 agent.py
 - **Zahra Nait Atman**
 - **Camélia Charef**
 
-Supervisors: Lyes Khoukhi — Abdel Senoussaoui
-
-**Browser → http://192.168.100.1:5000**
